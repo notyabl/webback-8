@@ -32,7 +32,7 @@
       padding: 0 20px;
     }
 
-    /* ========== NAVIGATION ========== */
+    /* ========== NAVIGATION (ИСПРАВЛЕННАЯ) ========== */
     .navbar {
       background: rgba(15, 23, 42, 0.92);
       backdrop-filter: blur(12px);
@@ -45,8 +45,10 @@
 
     .nav-inner {
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      justify-content: center;
       align-items: center;
+      gap: 1rem 2rem;
       padding: 0.9rem 0;
     }
 
@@ -55,6 +57,7 @@
       font-weight: 800;
       color: #fff;
       letter-spacing: -0.5px;
+      white-space: nowrap;
     }
 
     .logo span {
@@ -63,8 +66,12 @@
 
     .nav-links {
       display: flex;
-      gap: 2.2rem;
+      flex-wrap: wrap;
+      gap: 2rem;
       list-style: none;
+      margin: 0;
+      padding: 0;
+      align-items: center;
     }
 
     .nav-links a {
@@ -73,6 +80,7 @@
       font-size: 0.95rem;
       transition: color 0.25s;
       position: relative;
+      white-space: nowrap;
     }
 
     .nav-links a::after {
@@ -92,6 +100,35 @@
 
     .nav-links a:hover::after {
       width: 100%;
+    }
+
+    /* ===== АДАПТИВНОСТЬ НАВИГАЦИИ ===== */
+    @media (max-width: 768px) {
+      .nav-inner {
+        gap: 0.8rem;
+        padding: 0.7rem 0;
+      }
+      .logo {
+        font-size: 1.4rem;
+      }
+      .nav-links {
+        gap: 1.2rem;
+      }
+      .nav-links a {
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-links {
+        gap: 0.8rem;
+      }
+      .nav-links a {
+        font-size: 0.7rem;
+      }
+      .logo {
+        font-size: 1.2rem;
+      }
     }
 
     /* ========== HERO ========== */
@@ -477,39 +514,6 @@
       font-size: 0.9rem;
       margin-bottom: 0.3rem;
     }
-
-    /* ========== RESPONSIVE ========== */
-    @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 2.2rem;
-      }
-      .hero p {
-        font-size: 1rem;
-      }
-      .nav-links {
-        gap: 1.2rem;
-      }
-      .form-card {
-        padding: 2rem 1.5rem;
-      }
-      .section-title h2 {
-        font-size: 1.8rem;
-      }
-      .services-grid,
-      .features-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .services-grid,
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-      .nav-links {
-        display: none; /* упрощённо – можно добавить бургер, но для краткости оставлю */
-      }
-    }
   </style>
 </head>
 <body>
@@ -558,7 +562,7 @@
       <div class="service-card">
         <div class="service-icon">🛡️</div>
         <h3>Аудит безопасности</h3>
-        <p>Миграция, импорт контента и апгрейд, мониторинг безопасности</p>
+        <p>Миграция, импорт контента и интерфейс, мониторинг безопасности</p>
       </div>
       <div class="service-card">
         <div class="service-icon">⚡</div>
