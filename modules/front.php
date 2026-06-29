@@ -1,40 +1,93 @@
 <?php
 require_once('db.php');
 
+// Обработчик запросов методом GET.
 function front_get($request) {
+  // Получаем список языков для формы.
   $languages = db_query("SELECT name FROM programming_languages ORDER BY name");
+  
   $c = array(
     'languages' => $languages,
     'title' => 'Анкета разработчика - CodeCraft Studio',
     'values' => array(),
     'errors' => array(),
   );
+  
   return theme('form', $c);
 }
 
+// Обработчик запросов методом POST.
 function front_post($request) {
-  $errors = validate_application($request['post']);
+  // Проверяем, пришел ли JSON
+  $isJson = false;
+  if (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+    $isJson = true;
+    $rawData = file_get_contents('php://input');
+    $data = json_decode($rawData, true);
+  } else {
+    $data = !empty($request['post']) ? $request['post'] : array();
+  }
+  
+  // Валидация
+  $errors = validate_application($data);
   
   if (!empty($errors)) {
-    $languages = db_query("SELECT name FROM programming_languages ORDER BY name");
-    $c = array(
-      'languages' => $languages,
-      'errors' => $errors,
-      'values' => $request['post'],
-      'title' => 'Анкета разработчика - CodeCraft Studio',
-    );
-    return theme('form', $c);
+    if ($isJson) {
+      return array(
+        'headers' => array(
+          'Content-Type' => 'application/json; charset=utf-8',
+          'HTTP/1.1 400 Bad Request'
+        ),
+        'entity' => json_encode(array('errors' => $errors)),
+      );
+    } else {
+      $languages = db_query("SELECT name FROM programming_languages ORDER BY name");
+      $c = array(
+        'languages' => $languages,
+        'errors' => $errors,
+        'values' => $data,
+        'title' => 'Анкета разработчика - CodeCraft Studio',
+      );
+      return theme('form', $c);
+    }
   }
   
-  $result = save_application($request['post']);
+  // Сохранение данных
+  $result = save_application($data);
   
   if ($result['success']) {
-    header('Content-Type: application/json; charset=utf-8');
-    return json_encode($result);
-  }
-  else {
-    header('Content-Type: application/json; charset=utf-8');
-    return json_encode(array('error' => $result['error']));
+    if ($isJson) {
+      return array(
+        'headers' => array('Content-Type' => 'application/json; charset=utf-8'),
+        'entity' => json_encode($result),
+      );
+    } else {
+      // Фоллбек - показываем результат в HTML
+      return '<div style="background:#dcfce7;padding:2rem;border-radius:1rem;margin:2rem auto;max-width:600px;">
+        <h2 style="color:#166534;">✅ Регистрация успешна!</h2>
+        <p>Сохраните ваши данные для входа:</p>
+        <div style="background:white;padding:1rem;border-radius:0.5rem;margin:1rem 0;font-family:monospace;">
+          <p><strong>🔑 Логин:</strong> ' . htmlspecialchars($result['login']) . '</p>
+          <p><strong>🔒 Пароль:</strong> ' . htmlspecialchars($result['password']) . '</p>
+        </div>
+        <p>📍 Адрес профиля: <a href="' . htmlspecialchars($result['profile_url']) . '">' . htmlspecialchars($result['profile_url']) . '</a></p>
+      </div>';
+    }
+  } else {
+    if ($isJson) {
+      return array(
+        'headers' => array(
+          'Content-Type' => 'application/json; charset=utf-8',
+          'HTTP/1.1 500 Internal Server Error'
+        ),
+        'entity' => json_encode(array('error' => $result['error'])),
+      );
+    } else {
+      return '<div style="background:#fef2f2;padding:2rem;border-radius:1rem;margin:2rem auto;max-width:600px;">
+        <h2 style="color:#991b1b;">❌ Ошибка</h2>
+        <p>' . htmlspecialchars($result['error']) . '</p>
+      </div>';
+    }
   }
 }
 
@@ -55,13 +108,11 @@ function validate_application($data) {
   
   if (empty($data['birth_date'])) {
     $errors['birth_date'] = 'Укажите дату рождения';
-  }
-  else {
+  } else {
     $date = DateTime::createFromFormat('Y-m-d', $data['birth_date']);
     if (!$date) {
       $errors['birth_date'] = 'Неверный формат даты';
-    }
-    else {
+    } else {
       $age = date_diff($date, new DateTime())->y;
       if ($age < 18 || $age > 120) {
         $errors['birth_date'] = 'Возраст от 18 до 120 лет';
@@ -90,6 +141,7 @@ function save_application($data) {
   try {
     $db->beginTransaction();
     
+    // Генерируем логин и пароль
     $login = 'user_' . substr(md5(uniqid(mt_rand(), true)), 0, 8);
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     $password = '';
@@ -98,15 +150,18 @@ function save_application($data) {
     }
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
     
+    // Создаем пользователя
     db_command("INSERT INTO users (login, password_hash, email) VALUES (?, ?, ?)", 
       $login, $password_hash, $data['email']);
     $user_id = db_insert_id();
     
+    // Создаем заявку
     db_command("INSERT INTO applications (user_id, full_name, phone, email, birth_date, gender, biography, contract_agreed) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       $user_id, $data['full_name'], $data['phone'], $data['email'], $data['birth_date'], 
       $data['gender'], $data['biography'] ?? '', isset($data['contract']) ? 1 : 0);
     $app_id = db_insert_id();
     
+    // Сохраняем языки
     foreach ($data['languages'] as $lang) {
       $lang_id = db_result("SELECT id FROM programming_languages WHERE name = ?", $lang);
       if ($lang_id) {

@@ -15,7 +15,7 @@ $conf = array(
   'login' => 'admin',
   'password' => '123',
   'admin_mail' => 'student@kubsu.ru',
-  // Настройки БД - ДОБАВИТЬ!
+  // Настройки БД
   'db_host' => 'localhost',
   'db_name' => 'u82291',
   'db_user' => 'u82291',
