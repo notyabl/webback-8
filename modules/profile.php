@@ -148,8 +148,32 @@ function profile_post($request) {
     
     $db->commit();
     
-    $_SESSION['profile_success'] = 'Данные успешно обновлены!';
-    return redirect('profile');
+    // Перезагружаем данные после обновления
+$stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$stmt = $db->prepare("SELECT * FROM applications WHERE user_id = ? ORDER BY id DESC LIMIT 1");
+$stmt->execute([$user_id]);
+$application = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$languages = array();
+if ($application) {
+  $stmt = $db->prepare("SELECT pl.name FROM application_languages al JOIN programming_languages pl ON al.language_id = pl.id WHERE al.application_id = ?");
+  $stmt->execute([$application['id']]);
+  $languages = $stmt->fetchAll(PDO::FETCH_COLUMN);
+}
+
+$c = array(
+  'title' => 'Личный кабинет - CodeCraft Studio',
+  'user' => $user,
+  'application' => $application,
+  'languages' => $languages,
+  'errors' => array(),
+  'success' => 'Данные успешно обновлены!',
+);
+
+return theme('profile', $c);
     
   } catch (PDOException $e) {
     $db->rollBack();
