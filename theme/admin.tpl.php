@@ -1,7 +1,7 @@
 <h1>👑 Админ-панель</h1>
 
 <?php if (!empty($c['applications'])): ?>
-  <table class="admin-table">
+  <table>
     <thead>
       <tr>
         <th>ID</th>
@@ -26,13 +26,13 @@
           <td><?php echo $app['gender'] == 'male' ? 'М' : 'Ж'; ?></td>
           <td>
             <?php foreach ($app['languages'] as $lang): ?>
-              <span class="lang-badge"><?php echo htmlspecialchars($lang); ?></span>
+              <span style="background:#e8f4fd; color:#2196F3; padding:2px 8px; border-radius:12px; font-size:11px; display:inline-block; margin:2px;"><?php echo htmlspecialchars($lang); ?></span>
             <?php endforeach; ?>
           </td>
-          <td><?php echo $app['contract_agreed'] ? '✅' : '❌'; ?></td>
+          <td><?php echo isset($app['contract_agreed']) && $app['contract_agreed'] ? '✅' : '❌'; ?></td>
           <td>
-            <form action="/admin/<?php echo $app['id']; ?>" method="POST" style="display: inline;">
-              <button type="submit" class="btn-delete" onclick="return confirm('Удалить заявку #<?php echo $app['id']; ?>?')">🗑️</button>
+            <form action="/admin/<?php echo $app['id']; ?>" method="POST" style="display:inline;">
+              <button type="submit" style="background:#f44336; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;" onclick="return confirm('Удалить заявку #<?php echo $app['id']; ?>?')">🗑️ Удалить</button>
             </form>
           </td>
         </tr>
@@ -40,5 +40,5 @@
     </tbody>
   </table>
 <?php else: ?>
-  <p class="empty-message">Нет данных</p>
+  <p>Нет данных</p>
 <?php endif; ?>

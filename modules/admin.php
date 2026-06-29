@@ -1,9 +1,12 @@
 <?php
+// Подключаем работу с БД
+require_once('db.php');
+
 // Обработчик запросов методом GET.
 function admin_get($request) {
   global $db;
   
-  // Получаем все заявки
+  // Получаем все заявки из БД
   $applications = db_query("SELECT * FROM applications ORDER BY id DESC");
   
   // Получаем языки для каждой заявки
