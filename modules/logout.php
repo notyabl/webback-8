@@ -4,8 +4,8 @@ function logout_get($request) {
   session_unset();
   session_destroy();
   
-  // Принудительный редирект без использования функции redirect()
-  header('Location: ' . $_SERVER['HTTP_HOST'] . '/webback-8/');
+  // Абсолютный редирект
+  header('Location: http://' . $_SERVER['HTTP_HOST'] . '/webback-8/');
   exit();
 }
 ?>
