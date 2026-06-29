@@ -32,58 +32,66 @@
       padding: 0 20px;
     }
 
-   /* ===== NAVIGATION (исправленная) ===== */
+	/* ===== НАВИГАЦИОННАЯ ПАНЕЛЬ (full‑width, логотип слева, меню по центру) ===== */
 .navbar {
-  background: rgba(15, 23, 42, 0.92);
-  backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
   position: fixed;
   width: 100%;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0 20px; /* отступы по бокам для красоты */
 }
 
 .nav-inner {
+  max-width: 1200px;  /* ширина контента, можно изменить */
+  margin: 0 auto;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;  /* ← логотип слева, меню справа */
   align-items: center;
-  padding: 0.9rem 0;
-  gap: 0.5rem 1.5rem;
+  justify-content: space-between; /* логотип слева, остальное пространство занимает меню */
+  padding: 0.8rem 0;
 }
 
+/* Логотип – всегда слева */
 .logo {
   font-size: 1.7rem;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.5px;
   white-space: nowrap;
+  flex-shrink: 0;
+  margin-right: 2rem; /* отступ от меню */
 }
 
 .logo span {
   color: #3b82f6;
 }
 
+/* Меню – центрируется в оставшемся пространстве */
 .nav-links {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center; /* ← пункты по центру */
   gap: 2rem;
   list-style: none;
   margin: 0;
   padding: 0;
-  align-items: center;
+  flex: 1; /* занимает всё доступное пространство */
 }
 
 .nav-links a {
   color: #e2e8f0;
-  font-weight: 600;           /* ← чуть жирнее */
-  font-size: 1.05rem;         /* ← чуть больше */
+  font-weight: 600;
+  font-size: 1.05rem;   /* чуть крупнее */
   padding: 0.4rem 0.2rem;
   transition: color 0.25s;
   position: relative;
   white-space: nowrap;
+  text-decoration: none;
 }
 
+/* подчёркивание при наведении */
 .nav-links a::after {
   content: '';
   position: absolute;
@@ -103,17 +111,20 @@
   width: 100%;
 }
 
-/* ===== АДАПТИВНОСТЬ ===== */
+/* ===== АДАПТИВНОСТЬ (планшеты и телефоны) ===== */
 @media (max-width: 768px) {
   .nav-inner {
-    justify-content: center;   /* на узких экранах всё по центру */
+    flex-wrap: wrap;
+    justify-content: center; /* на узких экранах всё по центру */
     gap: 0.8rem;
     padding: 0.7rem 0;
   }
   .logo {
     font-size: 1.5rem;
+    margin-right: 0;
   }
   .nav-links {
+    flex: 0 1 auto; /* сбрасываем flex:1, чтобы не растягивалось */
     gap: 1.2rem;
   }
   .nav-links a {
