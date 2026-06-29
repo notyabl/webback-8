@@ -705,14 +705,14 @@
       submitBtn.disabled = true;
       
       // Отправка через Fetch API
-      fetch('/', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(data),
-      })
+      fetch('', {  // Пустая строка - относительный URL
+  method: 'POST',
+  headers: { 
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  body: JSON.stringify(data),
+})
       .then(response => {
         console.log('📥 Ответ сервера:', response);
         console.log('Content-Type:', response.headers.get('content-type'));
