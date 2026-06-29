@@ -34,7 +34,7 @@ function front_post($request) {
   }
   else {
     header('Content-Type: application/json; charset=utf-8');
-    return json_encode(array('error' => 'Ошибка сохранения'));
+    return json_encode(array('error' => $result['error']));
   }
 }
 

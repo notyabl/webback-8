@@ -21,7 +21,7 @@ function db_error() {
 
 function db_query($query) {
   global $db;
-  $r = array();
+  $r = array(); // <-- ВАЖНО: инициализация!
   $q = $db->prepare($query);
   $args = func_get_args();
   array_shift($args);
