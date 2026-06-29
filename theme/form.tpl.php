@@ -438,11 +438,11 @@
       <li><a href="#form">Анкета</a></li>
       <li><a href="#features">Поддержка</a></li>
       <?php if (!empty($c['is_logged_in'])): ?>
-        <li><a href="<?php echo url('logout'); ?>" style="color: #ef4444;">🚪 Выйти (<?php echo htmlspecialchars($c['user_login']); ?>)</a></li>
+        <li><a href="logout" style="color: #ef4444;">🚪 Выйти</a></li>
       <?php else: ?>
-        <li><a href="<?php echo url('login'); ?>">Войти</a></li>
+        <li><a href="login">Войти</a></li>
       <?php endif; ?>
-      <li><a href="<?php echo url('admin'); ?>">Админка</a></li>
+      <li><a href="admin">Админка</a></li>
     </ul>
   </div>
 </nav>

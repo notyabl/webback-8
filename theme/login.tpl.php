@@ -112,7 +112,7 @@
     </form>
     
     <div class="back-link">
-      <a href="<?php echo url(''); ?>">← На главную</a>
+      <a href="./">← На главную</a>
     </div>
   </div>
 </body>
