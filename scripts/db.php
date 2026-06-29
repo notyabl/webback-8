@@ -16,13 +16,13 @@ function db_row($stmt) {
 
 function db_query($query) {
   global $db;
-  $r = array();
+  $r = array(); // <-- Добавляем эту строку!
   $q = $db->prepare($query);
   $args = func_get_args();
   array_shift($args);
   $res = $q->execute($args);
   if ($res) {
-    while ($row = $q->fetch(PDO::FETCH_ASSOC)) {
+    while ($row = db_row($res)) {
       if (isset($row['id']) && !isset($r[$row['id']])) {
         $r[$row['id']] = $row;
       }
@@ -33,7 +33,6 @@ function db_query($query) {
   }
   return $r;
 }
-
 function db_result($query) {
   global $db;
   $q = $db->prepare($query);
