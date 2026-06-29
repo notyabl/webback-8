@@ -533,7 +533,7 @@
       </div>
     <?php endif; ?>
 
-    <form id="application-form" action="/" method="POST" novalidate>
+    <form id="application-form" action="" method="POST" novalidate>
       <div class="form-group">
         <label for="full_name">ФИО <span>*</span></label>
         <input type="text" id="full_name" name="full_name" 
@@ -658,8 +658,8 @@
       <div class="footer-links">
         <a href="#services">Услуги</a>
         <a href="#form">Анкета</a>
-        <a href="#features">Поддержка</a>
-        <a href="/webback-8/admin">Админ-панель</a>
+        <a href="admin">Админка</a>
+		<a href="admin">Админ-панель</a>
       </div>
       <p>&copy; <?php echo date('Y'); ?> CodeCraft Studio. Все права защищены.</p>
       <p>Профессиональная веб-разработка и поддержка</p>

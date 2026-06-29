@@ -1,14 +1,12 @@
 <?php
-// REST API для заявок.
+require_once('db.php');
 
-// GET /api/applications/{id} - получение данных заявки.
-function api_get($request, $id = NULL) {
+function api_get($request, $id = null) {
   global $db;
   
   if ($id) {
-    // Получаем заявку по ID.
     $stmt = $db->prepare("SELECT * FROM applications WHERE id = ?");
-    $stmt->execute([$id]);
+    $stmt->execute([(int)$id]);
     $app = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$app) {
@@ -18,7 +16,6 @@ function api_get($request, $id = NULL) {
       );
     }
     
-    // Получаем языки.
     $langStmt = $db->prepare("SELECT pl.name FROM application_languages al JOIN programming_languages pl ON al.language_id = pl.id WHERE al.application_id = ?");
     $langStmt->execute([$id]);
     $app['languages'] = $langStmt->fetchAll(PDO::FETCH_COLUMN);
@@ -32,13 +29,12 @@ function api_get($request, $id = NULL) {
   return not_found();
 }
 
-// POST /api/applications - создание новой заявки.
 function api_post($request) {
-  // Читаем JSON или form-data.
-  $data = !empty($request['json']) ? $request['json'] : $request['post'];
+  $data = !empty($request['post']) ? $request['post'] : array();
   
-  // Валидация.
+  require_once('front.php');
   $errors = validate_application($data);
+  
   if (!empty($errors)) {
     return array(
       'headers' => array('HTTP/1.1 400 Bad Request', 'Content-Type: application/json'),
@@ -46,7 +42,6 @@ function api_post($request) {
     );
   }
   
-  // Сохранение.
   $result = save_application($data);
   
   if ($result['success']) {
@@ -63,30 +58,14 @@ function api_post($request) {
   }
 }
 
-// PUT /api/applications/{id} - обновление заявки (требует авторизации).
 function api_put($request, $id) {
   global $db;
   
-  // Пользователь уже авторизован через auth_db_basic.
-  $user = $request['user'];
+  $data = !empty($request['post']) ? $request['post'] : array();
   
-  // Проверяем, что заявка принадлежит пользователю.
-  $stmt = $db->prepare("SELECT * FROM applications WHERE id = ? AND user_id = ?");
-  $stmt->execute([$id, $user['id']]);
-  $app = $stmt->fetch(PDO::FETCH_ASSOC);
-  
-  if (!$app) {
-    return array(
-      'headers' => array('HTTP/1.1 404 Not Found', 'Content-Type: application/json'),
-      'entity' => json_encode(array('error' => 'Заявка не найдена')),
-    );
-  }
-  
-  // Читаем данные.
-  $data = !empty($request['json']) ? $request['json'] : $request['post'];
-  
-  // Валидация.
+  require_once('front.php');
   $errors = validate_application($data);
+  
   if (!empty($errors)) {
     return array(
       'headers' => array('HTTP/1.1 400 Bad Request', 'Content-Type: application/json'),
@@ -97,31 +76,17 @@ function api_put($request, $id) {
   try {
     $db->beginTransaction();
     
-    // Обновляем заявку.
-    $stmt = $db->prepare("UPDATE applications SET full_name=?, phone=?, email=?, birth_date=?, gender=?, biography=?, contract_agreed=? WHERE id=? AND user_id=?");
-    $stmt->execute([
-      $data['full_name'],
-      $data['phone'],
-      $data['email'],
-      $data['birth_date'],
-      $data['gender'],
-      $data['biography'] ?? '',
-      isset($data['contract']) ? 1 : 0,
-      $id,
-      $user['id']
-    ]);
+    db_command("UPDATE applications SET full_name=?, phone=?, email=?, birth_date=?, gender=?, biography=?, contract_agreed=? WHERE id=?",
+      $data['full_name'], $data['phone'], $data['email'], $data['birth_date'], 
+      $data['gender'], $data['biography'] ?? '', isset($data['contract']) ? 1 : 0, (int)$id);
     
-    // Удаляем старые языки.
-    $db->prepare("DELETE FROM application_languages WHERE application_id = ?")->execute([$id]);
+    db_command("DELETE FROM application_languages WHERE application_id = ?", (int)$id);
     
-    // Вставляем новые языки.
-    $langStmt = $db->prepare("SELECT id FROM programming_languages WHERE name = ?");
-    $insertLang = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
     foreach ($data['languages'] as $lang) {
-      $langStmt->execute([$lang]);
-      $langData = $langStmt->fetch();
-      if ($langData) {
-        $insertLang->execute([$id, $langData['id']]);
+      $lang_id = db_result("SELECT id FROM programming_languages WHERE name = ?", $lang);
+      if ($lang_id) {
+        db_command("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)", 
+          (int)$id, $lang_id);
       }
     }
     

@@ -14,6 +14,11 @@ function db_row($stmt) {
   return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+function db_error() {
+  global $db;
+  return $db->errorInfo();
+}
+
 function db_query($query) {
   global $db;
   $r = array();
@@ -58,7 +63,7 @@ function db_command($query) {
   $q = $db->prepare($query);
   $args = func_get_args();
   array_shift($args);
-  return $res = $q->execute($args);
+  return $q->execute($args);
 }
 
 function db_insert_id() {
