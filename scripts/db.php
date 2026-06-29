@@ -21,7 +21,7 @@ function db_error() {
 
 function db_query($query) {
   global $db;
-  $r = array(); // <-- ВАЖНО: инициализация!
+  $r = array();
   $q = $db->prepare($query);
   $args = func_get_args();
   array_shift($args);
@@ -46,8 +46,9 @@ function db_result($query) {
   array_shift($args);
   $res = $q->execute($args);
   if ($res) {
-    if ($row = db_row($res)) {
-      return $row[0];
+    $row = $q->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+      return reset($row);
     }
     else {
       return FALSE;
@@ -69,4 +70,32 @@ function db_command($query) {
 function db_insert_id() {
   global $db;
   return $db->lastInsertId();
+}
+
+function db_get($name, $default = FALSE) {
+  if (strlen($name) == 0) {
+    return $default;
+  }
+  $value = db_result("SELECT value FROM variable WHERE name = ?", $name);
+  if ($value === FALSE) {
+    return $default;
+  }
+  else {
+    return $value;
+  }
+}
+
+function db_set($name, $value) {
+  if (strlen($name) == 0) {
+    return;
+  }
+  $v = db_get($name);
+  if ($v === FALSE) {
+    $q = "INSERT INTO variable VALUES (?, ?)";
+    return db_command($q, $name, $value) > 0;
+  }
+  else {
+    $q = "UPDATE variable SET value = ? WHERE name = ?";
+    return db_command($q, $value, $name) > 0;
+  }
 }
