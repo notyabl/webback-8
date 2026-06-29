@@ -16,11 +16,11 @@ function db_row($stmt) {
 
 function db_query($query) {
   global $db;
+  $r = array(); // Инициализируем переменную
   $q = $db->prepare($query);
   $args = func_get_args();
   array_shift($args);
   $res = $q->execute($args);
-  $r = array();
   if ($res) {
     while ($row = db_row($res)) {
       if (isset($row['id']) && !isset($r[$row['id']])) {

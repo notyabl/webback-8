@@ -14,13 +14,14 @@ $conf = array(
   'date_format_2' => 'Y.m.d H:i',
   'date_format_3' => 'd.m.Y',
   'basedir' => '/',
+  'login' => 'admin',
+  'password' => '123',
+  'admin_mail' => 'student@kubsu.ru',
+  // Добавляем настройки БД
   'db_host' => 'localhost',
   'db_name' => 'u82291',
   'db_user' => 'u82291',
   'db_psw' => '7595792',
-  'login' => 'admin',
-  'password' => '123',
-  'admin_mail' => 'student@kubsu.ru',
 );
 
 // Определения ресурсов для диспатчера.
