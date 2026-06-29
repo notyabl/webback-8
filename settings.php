@@ -5,7 +5,7 @@ define('DISPLAY_ERRORS', 1);
 define('INCLUDE_PATH', './scripts' . PATH_SEPARATOR . './modules');
 
 $conf = array(
-  'sitename' => 'Анкета разработчика',
+  'sitename' => 'Demo Framework',
   'theme' => './theme',
   'charset' => 'UTF-8',
   'clean_urls' => TRUE,
@@ -16,8 +16,8 @@ $conf = array(
   'basedir' => '/',
   'login' => 'admin',
   'password' => '123',
-  'admin_mail' => 'student@kubsu.ru',
-  // Добавляем настройки БД
+  'admin_mail' => 'sin@kubsu.ru',
+  // Добавьте эти строки:
   'db_host' => 'localhost',
   'db_name' => 'u82291',
   'db_user' => 'u82291',
