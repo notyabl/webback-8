@@ -1,6 +1,7 @@
 <?php
 require_once('db.php');
 
+// GET /admin - список всех заявок
 function admin_get($request) {
   global $db;
   
@@ -15,7 +16,8 @@ function admin_get($request) {
   return theme('admin', ['applications' => $applications]);
 }
 
-function admin_post($request, $id = null) {
+// POST /admin/{id} - удаление заявки
+function admin_post($id, $request) {
   global $db;
   
   if ($id) {

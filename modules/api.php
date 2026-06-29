@@ -1,7 +1,8 @@
 <?php
 require_once('db.php');
 
-function api_get($request, $id = null) {
+// GET /api/applications/{id}
+function api_get($id = null, $request = null) {
   global $db;
   
   if ($id) {
@@ -26,9 +27,15 @@ function api_get($request, $id = null) {
     );
   }
   
-  return not_found();
+  // GET /api/applications - список всех заявок
+  $applications = db_query("SELECT * FROM applications ORDER BY id DESC");
+  return array(
+    'headers' => array('Content-Type: application/json'),
+    'entity' => json_encode($applications, JSON_UNESCAPED_UNICODE),
+  );
 }
 
+// POST /api/applications - создание новой заявки
 function api_post($request) {
   $data = !empty($request['post']) ? $request['post'] : array();
   
@@ -58,7 +65,8 @@ function api_post($request) {
   }
 }
 
-function api_put($request, $id) {
+// PUT /api/applications/{id} - обновление заявки
+function api_put($id, $request) {
   global $db;
   
   $data = !empty($request['post']) ? $request['post'] : array();

@@ -46,12 +46,16 @@ function init($request = array(), $urlconf = array()) {
       continue;
     }
     
-    $params = array('request' => $request);
+    // ИСПРАВЛЕНО: собираем параметры в правильном порядке
+    // Сначала позиционные (из URL), потом именованные (request)
+    $params = array();
     array_shift($matches);
     foreach ($matches as $key => $match) {
-      $params[$key] = $match[0];
+      $params[] = $match[0];
     }
+    $params[] = $request; // request всегда последний
     
+    // Вызываем функцию с позиционными аргументами
     if ($result = call_user_func_array($func, $params)) {
       if (is_array($result)) {
         $response = array_merge($response, $result);
