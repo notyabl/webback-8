@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?php echo htmlspecialchars($c['title'] ?? 'Анкета разработчика - Drupal Support'); ?></title>
+  <title><?php echo htmlspecialchars($c['title'] ?? 'Анкета разработчика - CodeCraft Studio'); ?></title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -44,6 +44,11 @@
       font-weight: 700;
       color: white;
       text-decoration: none;
+      cursor: pointer;
+    }
+
+    .logo:hover {
+      color: #3b82f6;
     }
 
     .logo span {
@@ -119,6 +124,24 @@
       margin-bottom: 1.5rem;
     }
 
+    .btn-primary {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+    }
+
     /* Services Section */
     .services {
       padding: 5rem 2rem;
@@ -175,6 +198,7 @@
       justify-content: center;
       color: white;
       font-size: 1.5rem;
+      font-weight: bold;
     }
 
     .service-card h3 {
@@ -440,23 +464,23 @@
   <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="/" class="logo">Drupal<span>-Coder</span></a>
+      <a href="#top" class="logo">Code<span>Craft</span></a>
       <ul class="nav-links">
         <li><a href="#services">Услуги</a></li>
         <li><a href="#form">Анкета</a></li>
         <li><a href="#features">Поддержка</a></li>
-        <li><a href="/admin">Админка</a></li>
+        <li><a href="/webback-8/admin">Админка</a></li>
       </ul>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <section class="hero">
+  <section class="hero" id="top">
     <div class="hero-content">
-      <div class="hero-badge">🚀 Профессиональная Drupal поддержка</div>
-      <h1>13 лет совершенствуем компетенции в Drupal поддержке!</h1>
+      <div class="hero-badge">🚀 Профессиональная веб-разработка</div>
+      <h1>13 лет совершенствуем компетенции в разработке!</h1>
       <p>Разрабатываем и оптимизируем модули, расширяем функциональность сайтов, обновляем дизайн</p>
-      <a href="#form" class="btn-submit" style="display: inline-block; width: auto; padding: 1rem 2rem;">Стать клиентом</a>
+      <a href="#form" class="btn-primary">Стать клиентом</a>
     </div>
   </section>
 
@@ -464,7 +488,7 @@
   <section class="services" id="services">
     <div class="section-title">
       <h2>Наши услуги</h2>
-      <p>Полный спектр услуг по разработке, поддержке и продвижению Drupal-сайтов</p>
+      <p>Полный спектр услуг по разработке, поддержке и продвижению сайтов</p>
     </div>
     <div class="services-grid">
       <div class="service-card">
@@ -480,12 +504,12 @@
       <div class="service-card">
         <div class="service-icon">🛡️</div>
         <h3>Аудит безопасности</h3>
-        <p>Миграция, импорт контента и апгрейд Drupal, мониторинг безопасности</p>
+        <p>Миграция, импорт контента и апгрейд, мониторинг безопасности</p>
       </div>
       <div class="service-card">
         <div class="service-icon">⚡</div>
         <h3>Оптимизация скорости</h3>
-        <p>Веб-маркетинг, консультации и работы по SEO, ускорение Drupal-сайтов</p>
+        <p>Веб-маркетинг, консультации и работы по SEO, ускорение сайтов</p>
       </div>
     </div>
   </section>
@@ -601,7 +625,7 @@
   <!-- Features Section -->
   <section class="features" id="features">
     <div class="section-title">
-      <h2>Поддержка от Drupal-coder</h2>
+      <h2>Поддержка от CodeCraft</h2>
     </div>
     <div class="features-grid">
       <div class="feature-card">
@@ -631,14 +655,13 @@
   <footer class="footer">
     <div class="footer-content">
       <div class="footer-links">
-        <a href="#">О нас</a>
-        <a href="#">Услуги</a>
-        <a href="#">Тарифы</a>
-        <a href="#">Контакты</a>
-        <a href="/admin">Админ-панель</a>
+        <a href="#services">Услуги</a>
+        <a href="#form">Анкета</a>
+        <a href="#features">Поддержка</a>
+        <a href="/webback-8/admin">Админ-панель</a>
       </div>
-      <p>&copy; <?php echo date('Y'); ?> Drupal-Coder. Все права защищены.</p>
-      <p>Профессиональная поддержка и разработка на Drupal</p>
+      <p>&copy; <?php echo date('Y'); ?> CodeCraft Studio. Все права защищены.</p>
+      <p>Профессиональная веб-разработка и поддержка</p>
     </div>
   </footer>
 
