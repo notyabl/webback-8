@@ -667,5 +667,100 @@
   </footer>
 
   <script src="js/form.js"></script>
+  
+  <!-- ... ваш существующий HTML формы ... -->
+
+<script>
+(function() {
+  const form = document.getElementById('application-form');
+  const resultDiv = document.getElementById('result-message');
+  
+  if (!form) {
+    console.error('Form not found!');
+    return;
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Очищаем предыдущие ошибки
+    document.querySelectorAll('.error-message').forEach(el => {
+      el.textContent = '';
+      el.style.display = 'none';
+    });
+    document.querySelectorAll('.error').forEach(el => {
+      el.classList.remove('error');
+    });
+    
+    // Собираем данные формы
+    const formData = new FormData(form);
+    const data = {
+      full_name: formData.get('full_name'),
+      phone: formData.get('phone'),
+      email: formData.get('email'),
+      birth_date: formData.get('birth_date'),
+      gender: formData.get('gender'),
+      biography: formData.get('biography'),
+      contract: formData.get('contract'),
+      languages: formData.getAll('languages[]'),
+    };
+    
+    // Показываем индикатор загрузки
+    const submitBtn = form.querySelector('.btn-submit');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Отправка...';
+    submitBtn.disabled = true;
+    
+    // Отправляем через Fetch API
+    fetch('/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        resultDiv.innerHTML = `
+          <div class="success-box" style="background:#dcfce7;border-left:4px solid #22c55e;padding:1.5rem;border-radius:0.5rem;margin-top:2rem;">
+            <h3 style="color:#166534;margin-bottom:1rem;">✅ Регистрация успешна!</h3>
+            <p style="margin-bottom:1rem;">Сохраните ваши данные для входа:</p>
+            <div style="background:white;padding:1rem;border-radius:0.5rem;margin:1rem 0;font-family:monospace;">
+              <p><strong>🔑 Логин:</strong> ${result.login}</p>
+              <p><strong>🔒 Пароль:</strong> ${result.password}</p>
+            </div>
+            <p>📍 Адрес профиля: <a href="${result.profile_url}" target="_blank" style="color:#3b82f6;">${result.profile_url}</a></p>
+            <p style="margin-top:1rem;font-size:0.875rem;color:#666;">⚠️ <strong>Важно:</strong> Запишите логин и пароль! Они показываются только один раз.</p>
+          </div>
+        `;
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        form.reset();
+      } else {
+        resultDiv.innerHTML = `
+          <div class="error-box" style="background:#fef2f2;border-left:4px solid #ef4444;padding:1.5rem;border-radius:0.5rem;margin-top:2rem;">
+            <h3 style="color:#991b1b;margin-bottom:1rem;">❌ Ошибка</h3>
+            <p>${result.error || 'Произошла ошибка при отправке'}</p>
+          </div>
+        `;
+        resultDiv.style.display = 'block';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      // Фоллбек: если JS не работает, показываем сообщение
+      resultDiv.innerHTML = '<div class="error-box" style="background:#fef2f2;border-left:4px solid #ef4444;padding:1.5rem;border-radius:0.5rem;margin-top:2rem;"><p>⚠️ Произошла ошибка. Попробуйте обновить страницу.</p></div>';
+      resultDiv.style.display = 'block';
+    })
+    .finally(() => {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+  });
+  
+  console.log('Form script loaded successfully!');
+})();
+</script>
 </body>
 </html>
