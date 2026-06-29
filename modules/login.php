@@ -1,17 +1,15 @@
 <?php
 require_once('db.php');
 
-// Обработчик GET - показать форму входа
 function login_get($request) {
   $c = array(
-    'title' => 'Вход в систему - CodeCraft Studio',
+    'title' => 'Вход в систему',
     'errors' => array(),
     'values' => array(),
   );
   return theme('login', $c);
 }
 
-// Обработчик POST - обработка входа
 function login_post($request) {
   global $db;
   
@@ -29,33 +27,31 @@ function login_post($request) {
   
   if (!empty($errors)) {
     $c = array(
-      'title' => 'Вход в систему - CodeCraft Studio',
+      'title' => 'Вход в систему',
       'errors' => $errors,
       'values' => $request['post'],
     );
     return theme('login', $c);
   }
   
-  // Ищем пользователя в БД
   $stmt = $db->prepare("SELECT id, login, password_hash, email FROM users WHERE login = ?");
   $stmt->execute([$login]);
   $user = $stmt->fetch(PDO::FETCH_ASSOC);
   
   if (!$user || !password_verify($password, $user['password_hash'])) {
     $c = array(
-      'title' => 'Вход в систему - CodeCraft Studio',
+      'title' => 'Вход в систему',
       'errors' => array('auth' => 'Неверный логин или пароль'),
       'values' => $request['post'],
     );
     return theme('login', $c);
   }
   
-  // Успешный вход - создаем сессию
   session_start();
   $_SESSION['user_id'] = $user['id'];
   $_SESSION['login'] = $user['login'];
   $_SESSION['email'] = $user['email'];
   
-  // Редирект на главную
   return redirect('');
 }
+?>
