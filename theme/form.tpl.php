@@ -438,6 +438,7 @@
       <li><a href="#form">Анкета</a></li>
       <li><a href="#features">Поддержка</a></li>
       <?php if (!empty($c['is_logged_in'])): ?>
+		<li><a href="profile">👤 Профиль</a></li>
         <li><a href="logout" style="color: #ef4444;">🚪 Выйти</a></li>
       <?php else: ?>
         <li><a href="login">Войти</a></li>

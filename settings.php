@@ -25,6 +25,7 @@ $urlconf = array(
   '' => array('module' => 'front'),
   '/^login$/' => array('module' => 'login'),
   '/^logout$/' => array('module' => 'logout'),
+  '/^profile$/' => array('module' => 'profile'),
   '/^api\/applications$/' => array('module' => 'api'),
   '/^api\/applications\/(\d+)$/' => array('module' => 'api'),
   '/^admin$/' => array('module' => 'admin', 'auth' => 'auth_basic'),
