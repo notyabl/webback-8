@@ -1,8 +1,10 @@
 <?php
+// Подключаем работу с БД
+require_once('db.php');
+
 // Обработчик запросов методом GET.
 function front_get($request) {
-  // Получаем список языков для формы.
-  global $db;
+  // Получаем список языков для формы
   $languages = db_query("SELECT name FROM programming_languages ORDER BY name");
   
   $c = array(
