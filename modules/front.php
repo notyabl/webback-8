@@ -1,21 +1,19 @@
 <?php
-// Подключаем работу с БД
-require_once('db.php');
-
 // Обработчик запросов методом GET.
 function front_get($request) {
-  // Получаем список языков для формы
+  // Получаем список языков для формы.
+  global $db;
   $languages = db_query("SELECT name FROM programming_languages ORDER BY name");
   
   $c = array(
     'languages' => $languages,
-    'title' => 'Анкета разработчика',
+    'title' => 'Анкета разработчика - CodeCraft Studio',
   );
   
   return theme('form', $c);
 }
 
-// Обработчик запросов методом POST (фоллбек без JS).
+// Обработчик запросов методом POST.
 function front_post($request) {
   // Валидация и сохранение данных.
   $errors = validate_application($request['post']);
@@ -28,7 +26,7 @@ function front_post($request) {
       'languages' => $languages,
       'errors' => $errors,
       'values' => $request['post'],
-      'title' => 'Анкета разработчика',
+      'title' => 'Анкета разработчика - CodeCraft Studio',
     );
     return theme('form', $c);
   }
@@ -153,7 +151,7 @@ function save_application($data) {
       'success' => true,
       'login' => $login,
       'password' => $password,
-      'profile_url' => 'http://' . $_SERVER['HTTP_HOST'] . conf('basedir') . 'api/applications/' . $app_id,
+      'profile_url' => 'http://' . $_SERVER['HTTP_HOST'] . '/webback-8/api/applications/' . $app_id,
     );
   }
   catch (PDOException $e) {
@@ -161,3 +159,4 @@ function save_application($data) {
     return array('success' => false, 'error' => $e->getMessage());
   }
 }
+?>
