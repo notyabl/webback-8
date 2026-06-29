@@ -642,83 +642,122 @@
 <!-- JavaScript for Form Submission -->
 <script>
 (function() {
-  const form = document.getElementById('application-form');
-  const resultDiv = document.getElementById('result-message');
+  console.log('🔍 Инициализация скрипта формы...');
   
-  if (!form) {
-    console.error('Form not found!');
-    return;
+  // Ждем полной загрузки DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initForm);
+  } else {
+    initForm();
   }
-
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
+  
+  function initForm() {
+    console.log('📄 DOM загружен');
     
-    // Clear previous errors
-    document.querySelectorAll('.error-message').forEach(el => {
-      el.textContent = '';
-      el.style.display = 'none';
-    });
-    document.querySelectorAll('.error').forEach(el => {
-      el.classList.remove('error');
-    });
+    const form = document.getElementById('application-form');
+    const resultDiv = document.getElementById('result-message');
     
-    // Collect form data
-    const formData = new FormData(form);
-    const data = {
-      full_name: formData.get('full_name'),
-      phone: formData.get('phone'),
-      email: formData.get('email'),
-      birth_date: formData.get('birth_date'),
-      gender: formData.get('gender'),
-      biography: formData.get('biography'),
-      contract: formData.get('contract'),
-      languages: formData.getAll('languages[]'),
-    };
+    if (!form) {
+      console.error('❌ Форма с id="application-form" не найдена!');
+      console.log('Доступные формы:', document.querySelectorAll('form'));
+      return;
+    }
     
-    // Show loading indicator
-    const submitBtn = form.querySelector('.btn-submit');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = '⏳ Отправка...';
-    submitBtn.disabled = true;
+    console.log('✅ Форма найдена:', form);
+    console.log('✅ Result div:', resultDiv);
     
-    // Send via Fetch API
-    fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(result => {
-      if (result.success) {
-        resultDiv.innerHTML = `
-          <div style="background:#dcfce7;border-left:4px solid #22c55e;padding:1.5rem;border-radius:0.5rem;margin-top:2rem;">
-            <h3 style="color:#166534;margin-bottom:1rem;">✅ Регистрация успешна!</h3>
-            <p>Сохраните ваши данные для входа:</p>
-            <div style="background:white;padding:1rem;border-radius:0.5rem;margin:1rem 0;font-family:monospace;">
-              <p><strong>🔑 Логин:</strong> ${result.login}</p>
-              <p><strong>🔒 Пароль:</strong> ${result.password}</p>
+    // Добавляем обработчик submit
+    form.addEventListener('submit', function(e) {
+      console.log('🚀 Событие submit сработало!');
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log('⏸️ preventDefault() вызван');
+      
+      // Очищаем ошибки
+      document.querySelectorAll('.error-message').forEach(el => {
+        el.textContent = '';
+        el.style.display = 'none';
+      });
+      document.querySelectorAll('.error').forEach(el => {
+        el.classList.remove('error');
+      });
+      
+      // Собираем данные
+      const formData = new FormData(form);
+      const data = {
+        full_name: formData.get('full_name'),
+        phone: formData.get('phone'),
+        email: formData.get('email'),
+        birth_date: formData.get('birth_date'),
+        gender: formData.get('gender'),
+        biography: formData.get('biography'),
+        contract: formData.get('contract'),
+        languages: formData.getAll('languages[]'),
+      };
+      
+      console.log('📦 Данные формы:', data);
+      
+      // Показываем индикатор загрузки
+      const submitBtn = form.querySelector('.btn-submit');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = '⏳ Отправка...';
+      submitBtn.disabled = true;
+      
+      // Отправка через Fetch API
+      fetch('/', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => {
+        console.log('📥 Ответ сервера:', response);
+        console.log('Content-Type:', response.headers.get('content-type'));
+        return response.json();
+      })
+      .then(result => {
+        console.log('✅ Результат:', result);
+        
+        if (result.success) {
+          resultDiv.innerHTML = `
+            <div style="background:#dcfce7;border-left:4px solid #22c55e;padding:1.5rem;border-radius:0.5rem;margin-top:2rem;">
+              <h3 style="color:#166534;margin-bottom:1rem;">✅ Регистрация успешна!</h3>
+              <p>Сохраните ваши данные для входа:</p>
+              <div style="background:white;padding:1rem;border-radius:0.5rem;margin:1rem 0;font-family:monospace;">
+                <p><strong>🔑 Логин:</strong> ${result.login}</p>
+                <p><strong>🔒 Пароль:</strong> ${result.password}</p>
+              </div>
+              <p>📍 Адрес профиля: <a href="${result.profile_url}" target="_blank" style="color:#3b82f6;">${result.profile_url}</a></p>
+              <p style="margin-top:1rem;font-size:0.875rem;color:#666;">⚠️ <strong>Важно:</strong> Запишите логин и пароль! Они показываются только один раз.</p>
             </div>
-            <p>📍 Адрес профиля: <a href="${result.profile_url}" target="_blank" style="color:#3b82f6;">${result.profile_url}</a></p>
-            <p style="margin-top:1rem;font-size:0.875rem;color:#666;">⚠️ <strong>Важно:</strong> Запишите логин и пароль! Они показываются только один раз.</p>
-          </div>
-        `;
+          `;
+          resultDiv.style.display = 'block';
+          resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          form.reset();
+        } else {
+          resultDiv.innerHTML = `<div style="background:#fef2f2;border-left:4px solid #ef4444;padding:1.5rem;border-radius:0.5rem;margin-top:2rem;"><h3 style="color:#991b1b;">❌ Ошибка</h3><p>${result.error || 'Произошла ошибка'}</p></div>`;
+          resultDiv.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        console.error('❌ Ошибка fetch:', error);
+        // Фоллбек: если JSON не пришел, показываем сообщение
+        resultDiv.innerHTML = `<div style="background:#fef2f2;border-left:4px solid #ef4444;padding:1.5rem;border-radius:0.5rem;margin-top:2rem;"><h3 style="color:#991b1b;">⚠️ Внимание</h3><p>Произошла ошибка при отправке. Попробуйте еще раз.</p></div>`;
         resultDiv.style.display = 'block';
-        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        form.reset();
-      } else {
-        resultDiv.innerHTML = `<div style="background:#fef2f2;border-left:4px solid #ef4444;padding:1.5rem;border-radius:0.5rem;margin-top:2rem;"><h3 style="color:#991b1b;">❌ Ошибка</h3><p>${result.error || 'Произошла ошибка'}</p></div>`;
-        resultDiv.style.display = 'block';
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      form.submit(); // Fallback to regular form submission
-    })
-    .finally(() => {
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
-    });
-  });
+      })
+      .finally(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      });
+      
+      return false;
+    }, true); // Используем capture phase
+    
+    console.log('✅ Обработчик submit добавлен');
+  }
   
   console.log('✅ Form script loaded!');
 })();
