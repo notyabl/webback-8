@@ -15,7 +15,6 @@ $conf = array(
   'login' => 'admin',
   'password' => '123',
   'admin_mail' => 'student@kubsu.ru',
-  // Настройки БД
   'db_host' => 'localhost',
   'db_name' => 'u82291',
   'db_user' => 'u82291',
@@ -24,6 +23,8 @@ $conf = array(
 
 $urlconf = array(
   '' => array('module' => 'front'),
+  '/^login$/' => array('module' => 'login'),
+  '/^logout$/' => array('module' => 'logout'),
   '/^api\/applications$/' => array('module' => 'api'),
   '/^api\/applications\/(\d+)$/' => array('module' => 'api'),
   '/^admin$/' => array('module' => 'admin', 'auth' => 'auth_basic'),

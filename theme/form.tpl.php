@@ -437,6 +437,11 @@
       <li><a href="#services">Услуги</a></li>
       <li><a href="#form">Анкета</a></li>
       <li><a href="#features">Поддержка</a></li>
+      <?php if (!empty($c['is_logged_in'])): ?>
+        <li><a href="/logout" style="color: #ef4444;">🚪 Выйти (<?php echo htmlspecialchars($c['user_login']); ?>)</a></li>
+      <?php else: ?>
+        <li><a href="/login"> Войти</a></li>
+      <?php endif; ?>
       <li><a href="admin">Админка</a></li>
     </ul>
   </div>
@@ -451,6 +456,16 @@
     <a href="#form" class="btn-primary">Стать клиентом</a>
   </div>
 </section>
+
+<?php if (!empty($c['is_logged_in'])): ?>
+<section style="background: #dcfce7; padding: 1.5rem 0; text-align: center;">
+  <div class="container">
+    <p style="color: #166534; font-weight: 600; font-size: 1.1rem;">
+      ✅ Вы вошли как <strong><?php echo htmlspecialchars($c['user_login']); ?></strong>
+    </p>
+  </div>
+</section>
+<?php endif; ?>
 
 <!-- Services Section -->
 <section class="services" id="services">

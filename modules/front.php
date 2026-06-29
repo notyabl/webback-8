@@ -3,7 +3,12 @@ require_once('db.php');
 
 // Обработчик запросов методом GET.
 function front_get($request) {
-  // Получаем список языков для формы.
+  // Проверяем авторизацию
+  session_start();
+  $isLoggedIn = isset($_SESSION['user_id']);
+  $userLogin = $_SESSION['login'] ?? '';
+  
+  // Получаем список языков для формы
   $languages = db_query("SELECT name FROM programming_languages ORDER BY name");
   
   $c = array(
@@ -11,6 +16,8 @@ function front_get($request) {
     'title' => 'Анкета разработчика - CodeCraft Studio',
     'values' => array(),
     'errors' => array(),
+    'is_logged_in' => $isLoggedIn,
+    'user_login' => $userLogin,
   );
   
   return theme('form', $c);
@@ -41,12 +48,15 @@ function front_post($request) {
         'entity' => json_encode(array('errors' => $errors)),
       );
     } else {
+      session_start();
       $languages = db_query("SELECT name FROM programming_languages ORDER BY name");
       $c = array(
         'languages' => $languages,
         'errors' => $errors,
         'values' => $data,
         'title' => 'Анкета разработчика - CodeCraft Studio',
+        'is_logged_in' => isset($_SESSION['user_id']),
+        'user_login' => $_SESSION['login'] ?? '',
       );
       return theme('form', $c);
     }
@@ -62,7 +72,6 @@ function front_post($request) {
         'entity' => json_encode($result),
       );
     } else {
-      // Фоллбек - показываем результат в HTML
       return '<div style="background:#dcfce7;padding:2rem;border-radius:1rem;margin:2rem auto;max-width:600px;">
         <h2 style="color:#166534;">✅ Регистрация успешна!</h2>
         <p>Сохраните ваши данные для входа:</p>
@@ -70,7 +79,7 @@ function front_post($request) {
           <p><strong>🔑 Логин:</strong> ' . htmlspecialchars($result['login']) . '</p>
           <p><strong>🔒 Пароль:</strong> ' . htmlspecialchars($result['password']) . '</p>
         </div>
-        <p>📍 Адрес профиля: <a href="' . htmlspecialchars($result['profile_url']) . '">' . htmlspecialchars($result['profile_url']) . '</a></p>
+        <p>📍 <a href="/login">Войти в систему</a></p>
       </div>';
     }
   } else {
