@@ -1,12 +1,9 @@
 <?php
-// Подключаем работу с БД
-require_once('db.php');
-
 // Обработчик запросов методом GET.
 function admin_get($request) {
   global $db;
   
-  // Получаем все заявки из БД
+  // Получаем все заявки
   $applications = db_query("SELECT * FROM applications ORDER BY id DESC");
   
   // Получаем языки для каждой заявки
@@ -26,8 +23,8 @@ function admin_post($request, $id = null) {
   if ($id) {
     $id = (int)$id;
     // Удаляем заявку
-    $db->prepare("DELETE FROM application_languages WHERE application_id = ?")->execute([$id]);
-    $db->prepare("DELETE FROM applications WHERE id = ?")->execute([$id]);
+    db_command("DELETE FROM application_languages WHERE application_id = ?", $id);
+    db_command("DELETE FROM applications WHERE id = ?", $id);
   }
   
   return redirect('admin');

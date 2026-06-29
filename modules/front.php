@@ -1,34 +1,32 @@
 <?php
-// Подключаем работу с БД
-require_once('db.php');
-
 // Обработчик запросов методом GET.
 function front_get($request) {
-  // Получаем список языков для формы
+  // Получаем список языков для формы.
   $languages = db_query("SELECT name FROM programming_languages ORDER BY name");
   
   $c = array(
     'languages' => $languages,
-    'title' => 'Анкета разработчика',
+    'title' => 'Анкета разработчика - CodeCraft Studio',
+    'values' => array(),
+    'errors' => array(),
   );
   
   return theme('form', $c);
 }
 
-// Обработчик запросов методом POST (фоллбек без JS).
+// Обработчик запросов методом POST.
 function front_post($request) {
   // Валидация и сохранение данных.
   $errors = validate_application($request['post']);
   
   if (!empty($errors)) {
     // Возвращаем форму с ошибками.
-    global $db;
     $languages = db_query("SELECT name FROM programming_languages ORDER BY name");
     $c = array(
       'languages' => $languages,
       'errors' => $errors,
       'values' => $request['post'],
-      'title' => 'Анкета разработчика',
+      'title' => 'Анкета разработчика - CodeCraft Studio',
     );
     return theme('form', $c);
   }
@@ -118,32 +116,22 @@ function save_application($data) {
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
     
     // Создаем пользователя.
-    $stmt = $db->prepare("INSERT INTO users (login, password_hash, email) VALUES (?, ?, ?)");
-    $stmt->execute([$login, $password_hash, $data['email']]);
+    db_command("INSERT INTO users (login, password_hash, email) VALUES (?, ?, ?)", 
+      $login, $password_hash, $data['email']);
     $user_id = db_insert_id();
     
     // Создаем заявку.
-    $stmt = $db->prepare("INSERT INTO applications (user_id, full_name, phone, email, birth_date, gender, biography, contract_agreed) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([
-      $user_id,
-      $data['full_name'],
-      $data['phone'],
-      $data['email'],
-      $data['birth_date'],
-      $data['gender'],
-      $data['biography'] ?? '',
-      isset($data['contract']) ? 1 : 0
-    ]);
+    db_command("INSERT INTO applications (user_id, full_name, phone, email, birth_date, gender, biography, contract_agreed) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      $user_id, $data['full_name'], $data['phone'], $data['email'], $data['birth_date'], 
+      $data['gender'], $data['biography'] ?? '', isset($data['contract']) ? 1 : 0);
     $app_id = db_insert_id();
     
     // Сохраняем языки.
-    $langStmt = $db->prepare("SELECT id FROM programming_languages WHERE name = ?");
-    $insertLang = $db->prepare("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)");
     foreach ($data['languages'] as $lang) {
-      $langStmt->execute([$lang]);
-      $langData = $langStmt->fetch();
-      if ($langData) {
-        $insertLang->execute([$app_id, $langData['id']]);
+      $lang_id = db_result("SELECT id FROM programming_languages WHERE name = ?", $lang);
+      if ($lang_id) {
+        db_command("INSERT INTO application_languages (application_id, language_id) VALUES (?, ?)", 
+          $app_id, $lang_id);
       }
     }
     
@@ -153,7 +141,7 @@ function save_application($data) {
       'success' => true,
       'login' => $login,
       'password' => $password,
-      'profile_url' => 'http://' . $_SERVER['HTTP_HOST'] . conf('basedir') . 'api/applications/' . $app_id,
+      'profile_url' => 'http://' . $_SERVER['HTTP_HOST'] . '/webback-8/api/applications/' . $app_id,
     );
   }
   catch (PDOException $e) {
@@ -161,3 +149,4 @@ function save_application($data) {
     return array('success' => false, 'error' => $e->getMessage());
   }
 }
+?>
