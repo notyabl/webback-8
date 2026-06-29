@@ -1,11 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('application-form');
+  const resultDiv = document.getElementById('result-message');
+  
   if (!form) return;
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // Очищаем ошибки
+    // Очищаем предыдущие ошибки
     clearErrors();
     
     // Собираем данные формы
@@ -25,11 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const errors = validateForm(data);
     if (Object.keys(errors).length > 0) {
       showErrors(errors);
-      // Плавная прокрутка к первой ошибке
-      const firstError = document.querySelector('.error');
-      if (firstError) {
-        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
       return;
     }
     
@@ -50,23 +47,26 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(result => {
       if (result.success) {
-        showResult(`
+        resultDiv.innerHTML = `
           <div class="success-box">
             <h3>✅ Регистрация успешна!</h3>
             <p>Сохраните ваши данные для входа:</p>
             <div class="credentials">
               <p><strong>🔑 Логин:</strong> ${result.login}</p>
-              <p><strong>🔒 Пароль:</strong> ${result.password}</p>
+              <p><strong> Пароль:</strong> ${result.password}</p>
             </div>
-            <p>📍 Адрес профиля: <a href="${result.profile_url}" target="_blank">${result.profile_url}</a></p>
+            <p> Адрес профиля: <a href="${result.profile_url}" target="_blank">${result.profile_url}</a></p>
             <p style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.8;">
-              ⚠️ <strong>Важно:</strong> Запишите логин и пароль! Они показываются только один раз.
+              ️ <strong>Важно:</strong> Запишите логин и пароль! Они показываются только один раз.
             </p>
           </div>
-        `);
+        `;
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
         form.reset();
       } else {
-        showResult(`<div class="error-box"><h3>❌ Ошибка</h3><p>${result.error || 'Произошла ошибка при отправке'}</p></div>`);
+        resultDiv.innerHTML = `<div class="error-box"><h3>❌ Ошибка</h3><p>${result.error || 'Произошла ошибка при отправке'}</p></div>`;
+        resultDiv.style.display = 'block';
       }
     })
     .catch(error => {
@@ -83,22 +83,18 @@ document.addEventListener('DOMContentLoaded', function() {
   function validateForm(data) {
     const errors = {};
     
-    // ФИО
     if (!data.full_name || !/^[а-яА-ЯёЁa-zA-Z\s\-]{2,150}$/u.test(data.full_name)) {
       errors.full_name = 'ФИО: только буквы, пробелы и дефисы (2-150 символов)';
     }
     
-    // Телефон
     if (!data.phone || !/^[\+\d\s\(\)\-]{10,20}$/.test(data.phone)) {
       errors.phone = 'Неверный формат телефона';
     }
     
-    // Email
     if (!data.email || !/^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(data.email)) {
       errors.email = 'Неверный формат email';
     }
     
-    // Дата рождения
     if (!data.birth_date) {
       errors.birth_date = 'Укажите дату рождения';
     } else {
@@ -109,17 +105,14 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    // Пол
     if (!data.gender) {
       errors.gender = 'Выберите пол';
     }
     
-    // Языки
     if (!data.languages || data.languages.length === 0) {
       errors.languages = 'Выберите хотя бы один язык';
     }
     
-    // Контракт
     if (!data.contract) {
       errors.contract = 'Подтвердите ознакомление с контрактом';
     }
@@ -150,25 +143,4 @@ document.addEventListener('DOMContentLoaded', function() {
       el.classList.remove('error');
     });
   }
-  
-  function showResult(html) {
-    const resultEl = document.getElementById('result-message');
-    resultEl.innerHTML = html;
-    resultEl.style.display = 'block';
-    resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  
-  // Плавная прокрутка для якорных ссылок
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      const href = this.getAttribute('href');
-      if (href !== '#' && href.length > 1) {
-        e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
-    });
-  });
 });
