@@ -19,7 +19,8 @@ function profile_get($request) {
   $user = $stmt->fetch(PDO::FETCH_ASSOC);
   
   if (!$user) {
-    return redirect('logout');
+    session_destroy();
+    return redirect('login');
   }
   
   // Получаем последнюю заявку пользователя
@@ -59,7 +60,6 @@ function profile_post($request) {
   $user_id = $_SESSION['user_id'];
   $errors = array();
   
-  // Валидация
   $email = trim($request['post']['email'] ?? '');
   $full_name = trim($request['post']['full_name'] ?? '');
   $phone = trim($request['post']['phone'] ?? '');
@@ -115,34 +115,27 @@ function profile_post($request) {
     return theme('profile', $c);
   }
   
-  // Обновляем данные
   try {
     $db->beginTransaction();
     
-    // Обновляем email пользователя
     db_command("UPDATE users SET email = ? WHERE id = ?", $email, $user_id);
     
-    // Получаем или создаем заявку
     $stmt = $db->prepare("SELECT id FROM applications WHERE user_id = ? ORDER BY id DESC LIMIT 1");
     $stmt->execute([$user_id]);
     $app = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($app) {
-      // Обновляем существующую заявку
       db_command("UPDATE applications SET full_name=?, phone=?, email=?, birth_date=?, gender=?, biography=? WHERE id=?",
         $full_name, $phone, $email, $birth_date, $gender, $biography, $app['id']);
       $app_id = $app['id'];
       
-      // Удаляем старые языки
       db_command("DELETE FROM application_languages WHERE application_id = ?", $app_id);
     } else {
-      // Создаем новую заявку
       db_command("INSERT INTO applications (user_id, full_name, phone, email, birth_date, gender, biography, contract_agreed) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         $user_id, $full_name, $phone, $email, $birth_date, $gender, $biography, 1);
       $app_id = db_insert_id();
     }
     
-    // Сохраняем языки (если пришли из формы)
     if (!empty($request['post']['languages']) && is_array($request['post']['languages'])) {
       foreach ($request['post']['languages'] as $lang) {
         $lang_id = db_result("SELECT id FROM programming_languages WHERE name = ?", $lang);
@@ -155,7 +148,6 @@ function profile_post($request) {
     
     $db->commit();
     
-    // Перезагружаем страницу с сообщением об успехе
     $_SESSION['profile_success'] = 'Данные успешно обновлены!';
     return redirect('profile');
     
